@@ -10,6 +10,8 @@ public class ShipControls : MonoBehaviour
     private float nextTimeToShoot = 0;
     public float shipMovementSpeed = 1;
     public int radiusFromCamera = 10;
+    public float speed = .0001f;
+
 
     // Use this for initialization
     void Start()
@@ -17,27 +19,29 @@ public class ShipControls : MonoBehaviour
         playerShip = this.gameObject;
         Debug.Log("The playerShip is " + playerShip.name);
         moveDirection = Vector3.zero;
+        //moveDirection = Camera.main.transform.TransformDirection(moveDirection);
         Debug.Log("Screen Width: " + Screen.width + " Screen Height: " + Screen.height);
     }
 
     // Update is called once per frame
     void Update()
     {
+
         GetAxisInput();
         KeepPlayerInBounds();
         FireShipsWeapon();
-        Debug.DrawRay(transform.position, -transform.up,Color.black);
-       // viewportPos = Camera.main.WorldToViewportPoint(this.transform.position);
-        playerShip.transform.position += moveDirection * shipMovementSpeed * Time.deltaTime;
-       // playerShip.transform.position = Camera.main.ViewportToWorldPoint(viewportPos);
+        Debug.DrawRay(transform.position, -transform.up, Color.black);
+        // viewportPos = Camera.main.WorldToViewportPoint(this.transform.position);
+        //playerShip.transform.position += moveDirection * shipMovementSpeed * Time.deltaTime;
+        // playerShip.transform.position = Camera.main.ViewportToWorldPoint(viewportPos);
     }
     /// <summary>
     /// Used to grab input values from the input manager
     /// </summary>
     private void GetAxisInput()
     {
-        moveDirection.x = Input.GetAxis("ShipHorizontalMovement");
-        moveDirection.y = Input.GetAxis("ShipVerticalMovement");
+        MoveVertical();
+        MoveHorizontal();
     }
     /// <summary>
     /// Used to keep the player in the camera screen bounds
@@ -65,7 +69,7 @@ public class ShipControls : MonoBehaviour
     /// </summary>
     void BulletCreation()
     {
-        GameObject projectileClone = (GameObject)Instantiate(projectile, this.transform.position + new Vector3(0,-0.5f,0), transform.rotation);
+        GameObject projectileClone = (GameObject)Instantiate(projectile, this.transform.position + new Vector3(0, -0.5f, 0), transform.rotation);
         projectileClone.transform.SetParent(this.transform.parent);
     }
     /// <summary>
@@ -84,5 +88,15 @@ public class ShipControls : MonoBehaviour
             nextTimeToShoot -= Time.deltaTime;
         }
     }
-    
+    void MoveVertical()
+    {
+        Vector3 d = Camera.main.transform.up;
+        playerShip.transform.position += d * (Input.GetAxis("ShipVerticalMovement") * speed);
+    }
+    void MoveHorizontal()
+    {
+        Vector3 d = Camera.main.transform.right;
+        playerShip.transform.position += d * (Input.GetAxis("ShipHorizontalMovement") * speed);
+    }
+
 }
